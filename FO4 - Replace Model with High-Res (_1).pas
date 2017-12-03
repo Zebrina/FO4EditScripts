@@ -6,7 +6,7 @@
 }
 unit userscript;
 
-function GetResourceCount(fileName: string): string;
+function GetResourceCount(fileName: string): Integer;
 var
   slResList: TStringList;
 begin
@@ -16,9 +16,9 @@ begin
   slResList.Free;
 end;
 
-function TryReplaceModel(e: IInterface): string;
+function TryReplaceModel(e: IInterface): String;
 var
-  newFileName: string;
+  newFileName: String;
 begin
   if not Assigned(e) then exit;
 
@@ -27,9 +27,9 @@ begin
     SetEditValue(e, newFileName);
 end;
 
-function Process(e: IInterface): integer;
+function Process(e: IInterface): Integer;
 var
-  sig: string;
+  sig: String;
 begin
   Result := 0;
 

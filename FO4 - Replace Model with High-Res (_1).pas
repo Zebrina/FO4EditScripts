@@ -1,6 +1,8 @@
 {
   For weapon and object mod records.
   Replaces models with a high res if available. Either from specific first person model or _1 model.
+
+  Author: Zebrina
 }
 unit userscript;
 
@@ -18,7 +20,7 @@ function TryReplaceModel(e: IInterface): string;
 var
   newFileName: string;
 begin
-  if not Assigned(e) then Exit;
+  if not Assigned(e) then exit;
 
   newFileName := StringReplace(GetEditValue(e), '.nif', '_1.nif', [rfReplaceAll, rfIgnoreCase]);
   if GetResourceCount('meshes\' + newFileName) > 0 then

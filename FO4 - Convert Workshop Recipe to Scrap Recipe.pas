@@ -1,4 +1,4 @@
-{
+k{
   Converts Fallout 4 workshop recipes to scrap recipes.
 
   Author: Zebrina
@@ -23,7 +23,7 @@ end;
 
 function Process(e: IInterface): integer;
 var
-  kwda, k, fvpa, c: IInterface;
+  k, c: IInterface;
   i, n: integer;
 begin
   Result := 0;
@@ -43,19 +43,18 @@ begin
 
   // Remove existing filter keywords and add WorkshopRecipeFilterScrap keyword.
   RemoveElement(e, 'FNAM');
-  kwda := Add(e, 'FNAM', True);
-  k := ElementAssign(kwda, HighInteger, nil, False);
+  k := ElementAssign(Add(e, 'FNAM', True), HighInteger, nil, False);
   SetEditValue(k, '00106D8F');
 
-  fvpa := ElementBySignature(e, 'FVPA');
+  k := ElementBySignature(e, 'FVPA');
   i := 0;
-  n := ElementCount(fvpa);
+  n := ElementCount(k);
   while i < n do begin
-    c := ElementByPath(ElementByIndex(fvpa, i), 'Component');
-    if FormValueSignature(GetEditValue(C)) <> 'CMPO' then
+    c := ElementByPath(ElementByIndex(k, i), 'Component');
+    if FormValueSignature(GetEditValue(k)) <> 'CMPO' then
       i := i + 1
     else begin
-      SetEditValue(c, GetComponentScrapItem(C));
+      SetEditValue(c, GetComponentScrapItem(k));
       // Start over!
       i := 0;
     end;

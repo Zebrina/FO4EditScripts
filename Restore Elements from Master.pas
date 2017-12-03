@@ -1,5 +1,7 @@
 {
   Restore any record element from it's last master.
+
+  Author: Zebrina
 }
 unit UserScript;
 

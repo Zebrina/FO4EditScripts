@@ -1,4 +1,4 @@
-k{
+{
   Converts Fallout 4 workshop recipes to scrap recipes.
 
   Author: Zebrina

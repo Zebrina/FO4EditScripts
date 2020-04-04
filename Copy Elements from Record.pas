@@ -1,5 +1,5 @@
 {
-  Restore any record elements from it's last master.
+  Copy any record elements from another record.
 
   Author: Zebrina
 }
@@ -7,77 +7,67 @@ unit UserScript;
 
 var
   elementPathList: TStringList;
+  sourceRecord: IInterface;
 
 function Initialize: Integer;
 var
-  args: String;
+  args1, args2: String;
   i: Integer;
+  f: IwbFile;
+  formId: cardinal;
 begin
   Result := 0;
 
-  if not InputQuery('Elements', 'Enter one or more element paths separated by commas:', args) then begin
+  if not InputQuery('Elements', 'Enter one or more element paths separated by commas:', args1) then begin
     AddMessage('Script canceled.');
     Result := 1;
     exit;
   end;
 
-  if length(args) = 0 then begin
+  if length(args1) = 0 then begin
     AddMessage('Atleast one element path must be entered.');
     Result := 2;
+    exit;
+  end;
+
+  if not InputQuery('Record', 'Enter a load order valid form id:', args2) then begin
+    AddMessage('Script canceled.');
+    Result := 3;
+    exit;
+  end;
+
+  sourceRecord := RecordByFormID(FileByIndex((StrToIntDef('$' + args2, 0) shr 24) + 1), StrToInt('$' + args2), True);
+  if not Assigned(sourceRecord) then begin
+    AddMessage('''' + args2 + ''' is not a valid form id.');
+    Result := 4;
     exit;
   end;
 
   elementPathList := TStringList.Create;
   elementPathList.Delimiter := ',';
   elementPathList.StrictDelimiter := True;
-  elementPathList.DelimitedText := args;
-end;
-
-function HasMasterFile(e, m: IInterface): Boolean;
-var
-  i: Integer;
-begin
-  //AddMessage('Checking if ' + GetFileName(e) + ' has master ' + GetFileName(m));
-  Result := True;
-  if not Equals(e, m) then
-    for i := MasterCount(e) - 1 downto 0 do begin
-      if Equals(MasterByIndex(e, i), m) then
-        exit;
-    end;
-  Result := False;
+  elementPathList.DelimitedText := args1;
 end;
 
 function Process(e: IInterface): Integer;
 var
   i: Integer;
   elementPath: String;
-  m, rec: IInterface;
+  rec: IInterface;
   ml: TStringList;
 begin
-  m := Master(e);
-  if not Assigned(m) then
-    exit;
-
-  for i := Pred(OverrideCount(m)) downto 0 do begin
-    rec := OverrideByIndex(m, i);
-    if HasMasterFile(GetFile(e), GetFile(rec)) then begin
-      m := rec;
-      break;
-    end;
-  end;
-
   for i := 0 to Pred(elementPathList.Count) do begin
     elementPath := elementPathList[i];
-    AddMessage('Restoring ''' + elementPath + ''' from master: ' + GetFileName(GetFile(m)));
+    AddMessage('Copying ''' + elementPath + ''' from record: ' + Name(sourceRecord));
 
     RemoveElement(e, elementPath);
-    if not ElementExists(m, elementPath) then begin
+    if not ElementExists(sourceRecord, elementPath) then begin
       RemoveElement(e, elementPath);
       continue;
     end;
 
     ml := TStringList.Create;
-    rec := ElementByPath(m, elementPath);
+    rec := ElementByPath(sourceRecord, elementPath);
     ReportRequiredMasters(rec, ml, False, True);
     for i := 0 to Pred(ml.Count) do begin
       //AddMessage('Adding master: ' + ml[i]);

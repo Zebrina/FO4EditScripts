@@ -1,4 +1,4 @@
-k{
+{
   Converts Fallout 4 workshop recipes to scrap recipes.
 
   Author: Zebrina
@@ -10,12 +10,12 @@ begin
   Result := Copy(val, Pos('[', val) + 1, 4);
 end;
 
-function GetComponentScrapItem(c: IInterface): IInterface;
+function GetComponentScrapItem(cmpo: IInterface): IInterface;
 var
   val, form: string;
   rec: IInterface;
 begin
-  val := GetEditValue(c);
+  val := GetEditValue(cmpo);
   form := Copy(val, Pos(':', val) + 1, 8);
   rec := RecordByFormID(FileByIndex(0), StrToInt('$' + form), True);
   Result := GetElementEditValues(rec, 'MNAM');
@@ -23,7 +23,7 @@ end;
 
 function Process(e: IInterface): integer;
 var
-  k, c: IInterface;
+  k, cmpo, scrap: IInterface;
   i, n: integer;
 begin
   Result := 0;
@@ -49,12 +49,15 @@ begin
   k := ElementBySignature(e, 'FVPA');
   i := 0;
   n := ElementCount(k);
+  AddMessage('Recipe has ' + IntToStr(n) + ' components.');
   while i < n do begin
-    c := ElementByPath(ElementByIndex(k, i), 'Component');
-    if FormValueSignature(GetEditValue(k)) <> 'CMPO' then
+    cmpo := ElementByPath(ElementByIndex(k, i), 'Component');
+    if FormValueSignature(GetEditValue(cmpo)) <> 'CMPO' then
       i := i + 1
     else begin
-      SetEditValue(c, GetComponentScrapItem(k));
+      scrap := GetComponentScrapItem(cmpo);
+      AddMessage('Replacing component ' + GetEditValue(cmpo) + ' with ' + scrap + '.');
+      SetEditValue(cmpo, scrap);
       // Start over!
       i := 0;
     end;
